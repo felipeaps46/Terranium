@@ -1,0 +1,185 @@
+@startuml
+skinparam linetype ortho
+skinparam database {
+  BackgroundColor LightCoral
+  BorderColor Red
+  FontColor Black
+  ArrowColor Black
+}
+skinparam entity {
+  BackgroundColor LightGreen
+  BorderColor DarkGreen
+  FontColor Black
+}
+
+entity "USUARIOS" #LightGreen {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  email: VARCHAR(255) <<UNIQUE>>
+  senha_hash: VARCHAR(255)
+  role: VARCHAR(50) <<ENUM>>
+}
+
+entity "PERMISSOES" #LightGreen {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(100) <<UNIQUE>>
+  descricao: TEXT
+}
+
+entity "USUARIO_PERMISSOES" #LightYellow {
+  *usuario_id: UUID <<PK, FK>>
+  *permissao_id: UUID <<PK, FK>>
+}
+
+entity "PROPRIEDADES" #LightBlue {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  endereco: VARCHAR(255)
+  tamanho_ha: DECIMAL(10,2)
+  coordenadas: VARCHAR(255)
+  gerenciador_id: UUID <<FK>>
+}
+
+entity "AREAS_PLANTIO" #LightBlue {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  tamanho_ha: DECIMAL(10,2)
+  tipo_solo: VARCHAR(100)
+  propriedade_id: UUID <<FK>>
+}
+
+entity "CULTURAS" #LightSalmon {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  ciclo_vida_dias: INTEGER
+  informacoes_adicionais: TEXT
+}
+
+entity "PLANOS_SAFRA" #LightSalmon {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  ano_safra: INTEGER
+  data_inicio: DATE
+  data_fim: DATE
+  status: VARCHAR(50) <<ENUM>>
+  previsao_colheita_kg: DECIMAL(10,2)
+  cultura_id: UUID <<FK>>
+  area_plantio_id: UUID <<FK>>
+}
+
+entity "INSUMOS" #LightGreen {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  tipo: VARCHAR(50) <<ENUM>>
+  unidade_medida: VARCHAR(50)
+  quantidade_estoque: DECIMAL(10,2)
+  propriedade_id: UUID <<FK>>
+}
+
+entity "MOVIMENTACOES_ESTOQUE" #LightGreen {
+  *id: UUID <<PK>>
+  --
+  tipo: VARCHAR(50) <<ENUM>>
+  quantidade: DECIMAL(10,2)
+  data: TIMESTAMP
+  motivo: TEXT
+  insumo_id: UUID <<FK>>
+  usuario_registro_id: UUID <<FK>>
+}
+
+entity "CUSTOS_DESPESAS" #LightCoral {
+  *id: UUID <<PK>>
+  --
+  descricao: TEXT
+  valor: DECIMAL(10,2)
+  data: DATE
+  categoria: VARCHAR(100) <<ENUM>>
+  tipo: VARCHAR(50) <<ENUM>>
+  propriedade_id: UUID <<FK>>
+  usuario_registro_id: UUID <<FK>>
+}
+
+entity "OBSERVACOES_CAMPO" #LightSteelBlue {
+  *id: UUID <<PK>>
+  --
+  descricao: TEXT
+  data_hora: TIMESTAMP
+  geolocalizacao: VARCHAR(255)
+  url_foto: VARCHAR(500)
+  area_plantio_id: UUID <<FK>>
+  usuario_registro_id: UUID <<FK>>
+}
+
+entity "MEDICOES" #LightSteelBlue {
+  *id: UUID <<PK>>
+  --
+  tipo_medicao: VARCHAR(50) <<ENUM>>
+  valor: DECIMAL(10,2)
+  unidade: VARCHAR(50)
+  data_hora: TIMESTAMP
+  area_plantio_id: UUID <<FK>>
+  usuario_registro_id: UUID <<FK>>
+}
+
+entity "ATIVIDADES" #LightSalmon {
+  *id: UUID <<PK>>
+  --
+  nome: VARCHAR(255)
+  descricao: TEXT
+  data_hora_inicio: TIMESTAMP
+  data_hora_fim: TIMESTAMP
+  status: VARCHAR(50) <<ENUM>>
+  responsavel_id: UUID <<FK>>
+  plano_safra_id: UUID <<FK>>
+}
+
+entity "RELATORIOS" #LightBlue {
+  *id: UUID <<PK>>
+  --
+  tipo: VARCHAR(50) <<ENUM>>
+  periodo: VARCHAR(100)
+  dados_gerados: TEXT
+  data_geracao: TIMESTAMP
+  usuario_gerador_id: UUID <<FK>>
+  propriedade_id: UUID <<FK>>
+}
+
+
+' Relacionamentos
+USUARIOS ||--o{ USUARIO_PERMISSOES
+PERMISSOES ||--o{ USUARIO_PERMISSOES
+
+USUARIOS ||--o{ PROPRIEDADES : ""
+PROPRIEDADES ||--|{ AREAS_PLANTIO : ""
+
+AREAS_PLANTIO ||--o{ CULTURAS : ""
+CULTURAS ||--o{ PLANOS_SAFRA : ""
+AREAS_PLANTIO ||--o{ PLANOS_SAFRA : ""
+
+PROPRIEDADES ||--o{ INSUMOS : ""
+INSUMOS ||--o{ MOVIMENTACOES_ESTOQUE : ""
+USUARIOS ||--o{ MOVIMENTACOES_ESTOQUE : ""
+
+PROPRIEDADES ||--o{ CUSTOS_DESPESAS : ""
+USUARIOS ||--o{ CUSTOS_DESPESAS : ""
+
+AREAS_PLANTIO ||--o{ OBSERVACOES_CAMPO : ""
+USUARIOS ||--o{ OBSERVACOES_CAMPO :""
+
+AREAS_PLANTIO ||--o{ MEDICOES :""
+USUARIOS ||--o{ MEDICOES : ""
+
+PLANOS_SAFRA ||--o{ ATIVIDADES : ""
+USUARIOS ||--o{ ATIVIDADES : ""
+
+USUARIOS ||--o{ RELATORIOS : ""
+PROPRIEDADES ||--o{ RELATORIOS : ""
+
+@enduml

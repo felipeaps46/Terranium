@@ -1,0 +1,74 @@
+@startuml
+skinparam componentStyle uml2
+
+package "AgroGestor Pro System" {
+
+  component "Frontend\n(Web/Mobile)" as Frontend {
+    folder "Web App" as Web
+    folder "Mobile App" as Mobile
+  }
+
+  component "API Gateway" as APIGateway
+
+  component "Serviço de Usuários\ne Permissões" as SvcUsers
+  component "Serviço de Propriedades\ne Áreas" as SvcPropriedades
+  component "Serviço de Culturas" as SvcCulturas
+  component "Serviço de Planejamento\nde Safra" as SvcSafras
+  component "Serviço de Estoque\ne Insumos" as SvcEstoque
+  component "Serviço Financeiro\n(Custos e Despesas)" as SvcFinanceiro
+  component "Serviço de Campo\n(Observações, Medições)" as SvcCampo
+  component "Serviço de Mídias\n(Uploads)" as SvcMidias
+  component "Serviço de Relatórios\ne Análises" as SvcRelatorios
+  component "Serviço de Notificações" as SvcNotificacoes
+
+  database "Banco de Dados Central" as DB {
+    folder "Dados de Usuários" as DbUsers
+    folder "Dados de Propriedades" as DbProp
+    folder "Dados de Safras" as DbSafras
+    folder "Dados de Estoque" as DbEstoque
+    folder "Dados Financeiros" as DbFin
+    folder "Dados de Campo" as DbCampo
+  }
+
+  APIGateway -down-> SvcUsers
+  APIGateway -down-> SvcPropriedades
+  APIGateway -down-> SvcCulturas
+  APIGateway -down-> SvcSafras
+  APIGateway -down-> SvcEstoque
+  APIGateway -down-> SvcFinanceiro
+  APIGateway -down-> SvcCampo
+  APIGateway -down-> SvcMidias
+  APIGateway -down-> SvcRelatorios
+  APIGateway -down-> SvcNotificacoes
+
+  Frontend -- APIGateway : REST/HTTP
+
+  SvcUsers --> DB : Lê/Escreve
+  SvcPropriedades --> DB : Lê/Escreve
+  SvcCulturas --> DB : Lê/Escreve
+  SvcSafras --> DB : Lê/Escreve
+  SvcEstoque --> DB : Lê/Escreve
+  SvcFinanceiro --> DB : Lê/Escreve
+  SvcCampo --> DB : Lê/Escreve
+  SvcRelatorios --> DB : Lê (apenas)
+
+  SvcCampo .up.> SvcMidias : usa upload
+
+  SvcSafras .up.> SvcCulturas : consulta
+  SvcSafras .up.> SvcPropriedades : consulta
+
+  SvcEstoque .up.> SvcPropriedades : consulta
+
+  SvcFinanceiro .up.> SvcPropriedades : consulta
+
+  SvcRelatorios .up.> SvcUsers : consulta
+  SvcRelatorios .up.> SvcPropriedades : consulta
+  SvcRelatorios .up.> SvcSafras : consulta
+  SvcRelatorios .up.> SvcEstoque : consulta
+  SvcRelatorios .up.> SvcFinanceiro : consulta
+  SvcRelatorios .up.> SvcCampo : consulta
+
+  SvcNotificacoes .up.> SvcUsers : consulta
+  SvcNotificacoes .up.> SvcPropriedades : consulta
+}
+@enduml

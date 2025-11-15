@@ -1,0 +1,93 @@
+@startuml
+title Diagrama de Sequência: Acesso Geral a Funcionalidades do Sistema
+
+actor Proprietario as Prop
+actor Administrador as Admin
+actor Tecnico as Tec
+
+participant "Navegador Web" as Web
+participant "App Mobile" as Mobile
+participant "API Gateway" as APIGateway
+participant "Svc. Autenticação" as SvcAuth
+participant "Svc. Genérico" as SvcGeneric 
+database "Banco de Dados" as DB
+
+group Autenticação de Usuário
+
+alt Proprietário ou Administrador
+    Prop -> Web : 1. Acessar Sistema (URL)
+    Admin -> Web : 1. Acessar Sistema (URL)
+    Web -> Web : 1.1 Exibir tela de Login
+    Prop <-> Web : 1.2 Inserir Credenciais
+    Admin <-> Web : 1.2 Inserir Credenciais
+    Web -> APIGateway : 1.3 POST /auth/login (user, pass)
+else Técnico
+    Tec -> Mobile : 1. Abrir App Mobile
+    Mobile -> Mobile : 1.1 Exibir tela de Login
+    Tec <-> Mobile : 1.2 Inserir Credenciais
+    Mobile -> APIGateway : 1.3 POST /auth/login (user, pass)
+end alt
+
+APIGateway -> SvcAuth : 1.4 Chamar login(user, pass)
+SvcAuth -> DB : 1.5 Consultar Usuário/Senha
+DB --> SvcAuth : 1.6 Retornar Dados do Usuário
+SvcAuth --> APIGateway : 1.7 Retornar Token de Acesso / Erro
+APIGateway --> Web : 1.8 Retornar Token de Acesso / Erro
+APIGateway --> Mobile : 1.8 Retornar Token de Acesso / Erro
+
+alt Login Bem-sucedido
+    Web -> Web : 1.9 Armazenar Token, Redirecionar para Dashboard
+    Mobile -> Mobile : 1.9 Armazenar Token, Redirecionar para Dashboard
+    Prop -> Web : 1.10 Visualizar Dashboard
+    Admin -> Web : 1.10 Visualizar Dashboard
+    Tec -> Mobile : 1.10 Visualizar Dashboard
+else Login Falho
+    Web -> Prop : 1.9 Exibir Mensagem de Erro
+    Web -> Admin : 1.9 Exibir Mensagem de Erro
+    Mobile -> Tec : 1.9 Exibir Mensagem de Erro
+    deactivate APIGateway
+    deactivate SvcAuth
+    deactivate DB
+end alt
+end
+
+group Acesso a Funcionalidade (Ex: Cadastro de Propriedade, Planejar Safra, etc.)
+
+alt Proprietário ou Administrador (Web)
+    Prop -> Web : 2. Selecionar Funcionalidade (Ex: "Cadastrar Propriedade")
+    Web -> APIGateway : 2.1 GET /funcionalidade (com Token)
+else Técnico (Mobile)
+    Tec -> Mobile : 2. Selecionar Funcionalidade (Ex: "Cadastrar Observação")
+    Mobile -> APIGateway : 2.1 GET /funcionalidade (com Token)
+end alt
+
+APIGateway -> SvcAuth : 2.2 Validar Token
+SvcAuth --> APIGateway : 2.3 Token Válido / Inválido
+
+opt Token Válido
+    APIGateway -> SvcGeneric : 2.4 Chamar funcionalidade()
+    SvcGeneric -> DB : 2.5 Acessar/Persistir Dados
+    DB --> SvcGeneric : 2.6 Retornar Dados
+    SvcGeneric --> APIGateway : 2.7 Retornar Resultado da Funcionalidade
+    APIGateway --> Web : 2.8 Retornar Dados para Exibição
+    APIGateway --> Mobile : 2.8 Retornar Dados para Exibição
+
+    alt Proprietário ou Administrador (Web)
+        Web -> Web : 2.9 Exibir Interface da Funcionalidade (Formulários, Listas)
+        Prop <-> Web : 2.10 Interagir com a funcionalidade
+        Admin <-> Web : 2.10 Interagir com a funcionalidade
+    else Técnico (Mobile)
+        Mobile -> Mobile : 2.9 Exibir Interface da Funcionalidade (Formulários, Listas)
+        Tec <-> Mobile : 2.10 Interagir com a funcionalidade
+    end alt
+else Token Inválido
+    APIGateway --> Web : 2.8 Retornar Erro (HTTP 401 Unauthorized)
+    APIGateway --> Mobile : 2.8 Retornar Erro (HTTP 401 Unauthorized)
+    Web -> Prop : 2.9 Redirecionar para Login
+    Web -> Admin : 2.9 Redirecionar para Login
+    Mobile -> Tec : 2.9 Redirecionar para Login
+end alt
+
+end
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title Diagrama de Comunicação: Cadastrar Observação de Campo
+
+actor "Técnico" as T
+participant "App Mobile (ou Web)" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Campo" as SF
+participant "Serviço de Mídias" as SM
+database "Banco de Dados" as DB
+
+T <--> UI
+UI <--> API
+API <--> SF
+API <--> SM
+SF <--> DB
+
+T -> UI : 1: Acessa 'Cadastrar Observação de Campo'
+UI -> API : 2: Requisição GET /areas-plantio
+API -> SF : 3: Chama 'listarAreasPlantio()'
+SF -> DB : 4: Busca lista de áreas de plantio
+DB --> SF : 5: Retorna lista de áreas
+SF --> API : 6: Retorna lista de áreas
+API --> UI : 7: Retorna lista de áreas
+T -> UI : 8: Seleciona 'Área de Plantio', insere descrição, anexa foto, envia
+UI -> API : 9: Requisição POST /observacoes-campo
+API -> SM : 10: Upload da imagem
+SM --> API : 11: Retorna URL da imagem
+API -> SF : 12: Chama 'cadastrarObservacao(dadosObservacao, urlImagem)'
+SF -> DB : 13: Salva nova observação
+DB --> SF : 14: Confirma registro
+SF --> API : 15: Resposta de sucesso
+API --> UI : 16: Resposta 201 Created
+UI -> T : 17: Exibe mensagem de sucesso
+@enduml

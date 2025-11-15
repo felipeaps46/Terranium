@@ -1,0 +1,101 @@
+@startuml
+
+skinparam cloud {
+  BackgroundColor Azure
+  BorderColor SkyBlue
+  FontColor Black
+  Shadowing true
+}
+skinparam rectangle {
+  BackgroundColor LightBlue
+  BorderColor Blue
+  FontColor Black
+  Shadowing true
+}
+skinparam component {
+  BackgroundColor LightGreen
+  BorderColor DarkGreen
+  FontColor Black
+  Shadowing true
+}
+skinparam database {
+  BackgroundColor LightCoral
+  BorderColor Red
+  FontColor Black
+  Shadowing true
+}
+skinparam actor {
+  FontColor DarkBlue
+  BorderColor Blue
+}
+skinparam arrow {
+  Thickness 2
+  Color #5C6BC0
+  FontColor DarkBlue
+}
+
+title "Diagrama de Arquitetura do Sistema AgroGestor Pro"
+
+actor "Proprietário" as ActorProp
+actor "Administrador" as ActorAdmin
+actor "Técnico" as ActorTec
+
+rectangle "Camada Cliente" as ClientsLayer {
+    component "Navegador Web" as WebBrowser #LightCyan
+    component "App Mobile" as MobileApp #LightCyan
+}
+
+rectangle "Infraestrutura Cloud" as CloudInfra {
+
+    rectangle "Camada de Acesso (Edge)" as EdgeLayer #LightSteelBlue {
+        component "API Gateway" as APIGateway #LightGoldenRodYellow
+    }
+
+    rectangle "Camada de Serviços (Microservices)" as MicroservicesLayer {
+        component "Svc. Usuários\n& Permissões" as SvcUsers #LightGoldenRodYellow
+        component "Svc. Propriedades\n& Áreas" as SvcPropriedades #LightGoldenRodYellow
+        component "Svc. Planejamento\nSafra" as SvcSafras #LightGoldenRodYellow
+        component "Svc. Campo\n(Obs/Medições)" as SvcCampo #LightGoldenRodYellow
+        component "Svc. Financeiro" as SvcFinanceiro #LightGoldenRodYellow
+        component "Svc. Estoque\n& Insumos" as SvcEstoque #LightGoldenRodYellow
+        component "Svc. Mídias" as SvcMidias #LightGoldenRodYellow
+        component "Svc. Relatórios" as SvcRelatorios #LightGoldenRodYellow
+        component "Svc. Notificações" as SvcNotificacoes #LightGoldenRodYellow
+        component "Svc. Culturas" as SvcCulturas #LightGoldenRodYellow
+
+        SvcUsers -[hidden]right- SvcPropriedades
+        SvcPropriedades -[hidden]right- SvcCulturas
+        SvcCulturas -[hidden]right- SvcSafras
+        SvcSafras -[hidden]down- SvcCampo
+        SvcCampo -[hidden]right- SvcFinanceiro
+        SvcFinanceiro -[hidden]right- SvcEstoque
+        SvcEstoque -[hidden]right- SvcMidias
+        SvcMidias -[hidden]right- SvcRelatorios
+        SvcRelatorios -[hidden]right- SvcNotificacoes
+    }
+
+    rectangle "Camada de Dados" as DataLayer #LightSalmon {
+        database "Banco de Dados" as RDBMS #LightCoral
+        component "Armazenamento\nde Objetos (S3)" as ObjectStorage #LightCoral
+    }
+
+    APIGateway --> MicroservicesLayer :  ""
+
+    MicroservicesLayer --down-> RDBMS :  ""
+
+    SvcMidias --right-> ObjectStorage :  ""
+
+    SvcCampo .right.> SvcMidias : ""
+    SvcSafras .up.> SvcCulturas :  ""
+    SvcRelatorios .up.> SvcUsers :  ""
+}
+
+
+ActorProp -right-> WebBrowser :  ""
+ActorAdmin -right-> WebBrowser :  ""
+ActorTec -right-> MobileApp :  ""
+
+
+ClientsLayer --> APIGateway :  ""
+
+@enduml

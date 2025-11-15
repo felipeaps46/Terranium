@@ -1,0 +1,42 @@
+@startuml
+title Diagrama de Comunicação: Planejar Safra
+
+actor "Administrador" as A
+participant "Interface Web/Mobile" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Safras" as SS
+participant "Serviço de Culturas" as SC
+participant "Serviço de Áreas de Plantio" as SAP
+database "Banco de Dados" as DB
+
+A <--> UI
+UI <--> API
+API <--> SS
+API <--> SC
+API <--> SAP
+SC <--> DB
+SAP <--> DB
+SS <--> DB
+
+A -> UI : 1: Acessa 'Planejar Safra'
+UI -> API : 2: Requisição GET /culturas
+API -> SC : 3: Chama 'listarCulturas()'
+SC -> DB : 4: Busca culturas cadastradas
+DB --> SC : 5: Retorna lista de culturas
+SC --> API : 6: Retorna lista de culturas
+API --> UI : 7: Retorna lista de culturas
+UI -> API : 8: Requisição GET /areas-plantio
+API -> SAP : 9: Chama 'listarAreasPlantio()'
+SAP -> DB : 10: Busca áreas de plantio
+DB --> SAP : 11: Retorna lista de áreas
+SAP --> API : 12: Retorna lista de áreas
+API --> UI : 13: Retorna lista de áreas
+A -> UI : 14: Seleciona Cultura, Área, Período, Insumos e envia
+UI -> API : 15: Requisição POST /safras/plano
+API -> SS : 16: Chama 'criarPlanoSafra(dadosPlanoSafra)'
+SS -> DB : 17: Salva novo plano de safra
+DB --> SS : 18: Confirma registro
+SS --> API : 19: Resposta de sucesso
+API --> UI : 20: Resposta 201 Created
+UI -> A : 21: Exibe confirmação
+@enduml

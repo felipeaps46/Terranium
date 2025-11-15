@@ -1,0 +1,73 @@
+@startuml
+left to right direction
+
+actor Proprietario
+actor Administrador
+actor Tecnico
+
+Proprietario --|> Administrador
+
+rectangle "Sistema" {
+
+package "Casos de Uso (Proprietário)" {
+usecase UC01 as "Cadastrar Usuários"
+usecase UC02 as "Gerenciar Permissões"
+usecase UC03 as "Visualizar Relatórios Gerais"
+usecase UC04 as "Cadastrar Propriedade"
+usecase UC05 as "Gerenciar Áreas de Plantio (CRUD)"
+usecase UC06 as "Gerenciar Culturas (CRUD)"
+usecase UC07 as "Visualizar Status Geral da Fazenda"
+}
+package "Casos de Uso (Admnistrador)" {
+usecase UC08 as "Gerenciar Estoque de Insumos (CRUD)"
+usecase UC09 as "Registrar Movimentações de Estoque"
+usecase UC10 as "Planejar Safra (CRUD)"
+usecase UC11 as "Gerenciar Irrigação"
+usecase UC12 as "Gerenciar Custos e Despesas (CRUD)"
+usecase UC13 as "Emitir Relatórios Financeiros"
+usecase UC14 as "Acompanhar Andamento das Culturas"
+}
+package "Casos de Uso (Técnico)" {
+usecase UC15 as "Cadastrar Observações de Campo"
+usecase UC16 as "Atualizar Dados das Culturas"
+usecase UC17 as "Visualizar Áreas de Plantio"
+usecase UC18 as "Registrar Medições (solo, umidade, etc.)"
+usecase UC19 as "Acessar Agenda de Atividades"
+}
+}
+
+Proprietario --> UC01
+Proprietario --> UC02
+Proprietario --> UC03
+Proprietario --> UC04
+Proprietario --> UC05
+Proprietario --> UC06
+Proprietario --> UC07
+
+Administrador --> UC08
+Administrador --> UC09
+Administrador --> UC10
+Administrador --> UC11
+Administrador --> UC12
+Administrador --> UC13
+Administrador --> UC14
+
+Tecnico --> UC15
+Tecnico --> UC16
+Tecnico --> UC17
+Tecnico --> UC18
+Tecnico --> UC19
+
+UC01 ..> UC02 : <<include>>
+
+UC09 <.. UC08 : <<extend>>
+UC10 ..> UC06 : <<include>>
+UC14 ..> UC10 : <<include>>
+
+UC15 ..> UC17 : <<include>>
+UC16 ..> UC17 : <<include>>
+UC18 ..> UC17 : <<include>>
+
+
+
+@enduml

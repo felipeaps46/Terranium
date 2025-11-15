@@ -1,0 +1,31 @@
+@startuml
+autonumber
+actor "Proprietário" as P
+participant "Interface Web/Mobile" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Propriedades" as SP
+database "Banco de Dados" as DB
+
+P -> UI : Acessa 'Cadastrar Propriedade'
+activate UI
+UI -> P : Exibe formulário de cadastro de propriedade
+deactivate UI
+
+P -> UI : Preenche dados (Nome, Endereço, Tamanho, etc.) e envia
+activate UI
+UI -> API : Requisição POST /propriedades (dadosPropriedade)
+activate API
+API -> SP : Chama 'cadastrarPropriedade(dadosPropriedade)'
+activate SP
+SP -> SP : Valida dados da propriedade
+SP -> DB : Salva nova propriedade (dadosPropriedade)
+activate DB
+DB --> SP : Confirma registro (ID da Propriedade)
+deactivate DB
+SP --> API : Resposta de sucesso (ID da Propriedade)
+deactivate SP
+API --> UI : Resposta 201 Created (ID da Propriedade)
+deactivate API
+UI -> P : Exibe mensagem de sucesso e redireciona para dashboard
+deactivate UI
+@enduml

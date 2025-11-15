@@ -1,0 +1,24 @@
+@startuml
+title Diagrama de Comunicação: Cadastrar Propriedade
+
+actor "Proprietário" as P
+participant "Interface Web/Mobile" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Propriedades" as SP
+database "Banco de Dados" as DB
+
+P <--> UI
+UI <--> API
+API <--> SP
+SP <--> DB
+
+P -> UI : 1: Acessa 'Cadastrar Propriedade'
+P -> UI : 2: Preenche dados e envia
+UI -> API : 3: Requisição POST /propriedades (dadosPropriedade)
+API -> SP : 4: Chama 'cadastrarPropriedade(dadosPropriedade)'
+SP -> DB : 5: Salva nova propriedade (dadosPropriedade)
+DB --> SP : 6: Confirma registro (ID da Propriedade)
+SP --> API : 7: Resposta de sucesso (ID da Propriedade)
+API --> UI : 8: Resposta 201 Created (ID da Propriedade)
+UI -> P : 9: Exibe mensagem de sucesso
+@enduml

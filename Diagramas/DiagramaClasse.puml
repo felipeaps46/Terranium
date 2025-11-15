@@ -1,0 +1,231 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Core Domain - Terranium" {
+
+  package "Enums & Tipos" #LemonChiffon {
+    enum Role {
+      PROPRIETARIO
+      ADMINISTRADOR
+      TECNICO
+    }
+
+    enum StatusPlanoSafra {
+      CRIADO
+      APROVADO
+      EM_EXECUCAO
+      CONCLUIDO
+      CANCELADO
+      REVISAO_NECESSARIA
+    }
+
+    enum TipoInsumo {
+      FERTILIZANTE
+      PESTICIDA
+      SEMENTE
+      DEFENSIVO
+      OUTRO
+    }
+
+    enum TipoMovimentacaoEstoque {
+      ENTRADA
+      SAIDA
+      AJUSTE
+    }
+
+    enum CategoriaCustoDespesa {
+      MAO_DE_OBRA
+      INSUMOS
+      MANUTENCAO
+      COMBUSTIVEL
+      ENERGIA
+      OUTRO
+    }
+
+    enum TipoCustoDespesa {
+      CUSTO
+      DESPESA
+    }
+
+    enum TipoMedicao {
+      SOLO
+      UMIDADE
+      TEMPERATURA
+      PH
+      OUTRO
+    }
+
+    enum StatusAtividade {
+      PENDENTE
+      EM_ANDAMENTO
+      CONCLUIDA
+      CANCELADA
+    }
+
+    enum TipoRelatorio {
+      FINANCEIRO
+      PRODUCAO
+      ESTOQUE
+      CULTURA
+      PROPRIEDADE
+      GERAL
+    }
+  }
+
+  package "Gestão de Usuários e Acesso" #PaleGreen {
+    class Usuario {
+      - id: UUID
+      - nome: String
+      - email: String
+      - senhaHash: String
+      - role: Role
+      + autenticar(): Boolean
+      + autorizar(permissao: Permissao): Boolean
+    }
+
+    class Permissao {
+      - id: UUID
+      - nome: String
+      - descricao: String
+    }
+  }
+
+  package "Gestão de Propriedades e Cultivo" #LightSteelBlue {
+    class Propriedade {
+      - id: UUID
+      - nome: String
+      - endereco: String
+      - tamanhoHa: Decimal
+      - coordenadas: String
+      + cadastrarAreaPlantio(area: AreaPlantio): void
+    }
+
+    class AreaPlantio {
+      - id: UUID
+      - nome: String
+      - tamanhoHa: Decimal
+      - tipoSolo: String
+    }
+
+    class Cultura {
+      - id: UUID
+      - nome: String
+      - cicloVidaDias: Integer
+      - informacoesAdicionais: Text
+    }
+
+    class PlanoSafra {
+      - id: UUID
+      - nome: String
+      - anoSafra: Integer
+      - dataInicio: Date
+      - dataFim: Date
+      - status: StatusPlanoSafra
+      - previsaoColheitaKg: Decimal
+      + planejar(): void
+      + iniciarExecucao(): void
+      + concluir(): void
+    }
+  }
+
+  package "Gestão de Operações e Financeiro" #LightSalmon {
+    class Insumo {
+      - id: UUID
+      - nome: String
+      - tipo: TipoInsumo
+      - unidadeMedida: String
+      - quantidadeEstoque: Decimal
+    }
+
+    class MovimentacaoEstoque {
+      - id: UUID
+      - tipo: TipoMovimentacaoEstoque
+      - quantidade: Decimal
+      - data: DateTime
+      - motivo: String
+    }
+
+    class CustoDespesa {
+      - id: UUID
+      - descricao: String
+      - valor: Decimal
+      - data: Date
+      - categoria: CategoriaCustoDespesa
+      - tipo: TipoCustoDespesa
+    }
+  }
+
+  package "Monitoramento e Atividades de Campo" #Tan {
+    class ObservacaoCampo {
+      - id: UUID
+      - descricao: Text
+      - dataHora: DateTime
+      - geolocalizacao: String
+      - urlFoto: String (opcional)
+    }
+
+    class Medicao {
+      - id: UUID
+      - tipoMedicao: TipoMedicao
+      - valor: Decimal
+      - unidade: String
+      - dataHora: DateTime
+    }
+
+    class Atividade {
+      - id: UUID
+      - nome: String
+      - descricao: Text
+      - dataHoraInicio: DateTime
+      - dataHoraFim: DateTime
+      - status: StatusAtividade
+      - responsavel: Usuario
+    }
+  }
+
+  package "Relatórios" #Thistle {
+    class Relatorio {
+      - id: UUID
+      - tipo: TipoRelatorio
+      - periodo: String
+      - dadosGerados: Text/JSON
+      - dataGeracao: DateTime
+      + gerarRelatorio(): void
+    }
+  }
+
+' Relacionamentos
+' Gestão de Usuários e Acesso
+Usuario "1" -- "0..*" Permissao : ""  
+
+' Gestão de Propriedades e Cultivo
+Usuario "1" -- "0..*" Propriedade : ""  
+Propriedade "1" -- "1..*" AreaPlantio : ""  
+AreaPlantio "1" -- "0..*" Cultura : ""  
+Cultura "1" -- "0..*" PlanoSafra : "" 
+AreaPlantio "1" -- "0..*" PlanoSafra : "" 
+
+' Gestão de Operações e Financeiro
+Propriedade "1" -- "0..*" Insumo : "" 
+Insumo "1" -- "0..*" MovimentacaoEstoque : ""  
+MovimentacaoEstoque "1" -- "1" Usuario : "" 
+
+Propriedade "1" -- "0..*" CustoDespesa : ""  
+CustoDespesa "1" -- "1" Usuario : "" 
+
+' Monitoramento e Atividades de Campo
+AreaPlantio "1" -- "0..*" ObservacaoCampo : "" 
+ObservacaoCampo "1" -- "1" Usuario :"" 
+
+AreaPlantio "1" -- "0..*" Medicao : "" 
+Medicao "1" -- "1" Usuario : "" 
+
+PlanoSafra "1" -- "0..*" Atividade : ""  
+Usuario "1" -- "0..*" Atividade : ""  
+
+' Relatórios
+Usuario "1" -- "0..*" Relatorio : "" 
+Propriedade "1" -- "0..*" Relatorio : "" 
+
+}
+@enduml

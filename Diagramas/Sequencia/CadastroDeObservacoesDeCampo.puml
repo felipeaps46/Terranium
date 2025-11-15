@@ -1,0 +1,48 @@
+@startuml
+autonumber
+actor "Técnico" as T
+participant "App Mobile (ou Web)" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Campo" as SF
+participant "Serviço de Mídias" as SM
+database "Banco de Dados" as DB
+
+T -> UI : Acessa 'Cadastrar Observação de Campo'
+activate UI
+UI -> UI : Exibe interface para seleção de área e inserção de observação
+UI -> API : Requisição GET /areas-plantio (para seleção, UC17)
+activate API
+API -> SF : Chama 'listarAreasPlantio()'
+activate SF
+SF -> DB : Busca lista de áreas de plantio
+activate DB
+DB --> SF : Retorna lista de áreas
+deactivate DB
+SF --> API : Retorna lista de áreas
+deactivate SF
+API --> UI : Retorna lista de áreas para seleção
+deactivate API
+deactivate UI
+
+T -> UI : Seleciona 'Área de Plantio', insere descrição, anexa foto (opcional), registra geolocalização e envia
+activate UI
+UI -> API : Requisição POST /observacoes-campo (dadosObservacao)
+activate API
+API -> SM : Upload da imagem (se houver anexo)
+activate SM
+SM --> API : Retorna URL da imagem
+deactivate SM
+API -> SF : Chama 'cadastrarObservacao(dadosObservacao, urlImagem)'
+activate SF
+SF -> SF : Valida dados da observação
+SF -> DB : Salva nova observação (dadosObservacao, urlImagem, geolocalização)
+activate DB
+DB --> SF : Confirma registro (ID da Observação)
+deactivate DB
+SF --> API : Resposta de sucesso (ID da Observação)
+deactivate SF
+API --> UI : Resposta 201 Created (ID da Observação)
+deactivate API
+UI -> T : Exibe mensagem de sucesso
+deactivate UI
+@enduml

@@ -1,0 +1,59 @@
+@startuml
+autonumber
+actor "Administrador" as A
+participant "Interface Web/Mobile" as UI
+participant "Sistema (API Gateway)" as API
+participant "Serviço de Safras" as SS
+participant "Serviço de Culturas" as SC
+participant "Serviço de Áreas de Plantio" as SAP
+database "Banco de Dados" as DB
+
+A -> UI : Acessa 'Planejar Safra'
+activate UI
+UI -> UI : Exibe interface de planejamento
+UI -> API : Requisição GET /culturas (para dropdown)
+activate API
+API -> SC : Chama 'listarCulturas()'
+activate SC
+SC -> DB : Busca culturas cadastradas
+activate DB
+DB --> SC : Retorna lista de culturas
+deactivate DB
+SC --> API : Retorna lista de culturas
+deactivate SC
+API --> UI : Retorna lista de culturas
+deactivate API
+
+activate UI
+UI -> API : Requisição GET /areas-plantio (para dropdown)
+activate API
+API -> SAP : Chama 'listarAreasPlantio()'
+activate SAP
+SAP -> DB : Busca áreas de plantio
+activate DB
+DB --> SAP : Retorna lista de áreas
+deactivate DB
+SAP --> API : Retorna lista de áreas
+deactivate SAP
+API --> UI : Retorna lista de áreas
+deactivate API
+deactivate UI
+
+A -> UI : Seleciona Cultura (UC06), Área (UC05), Período, Insumos e envia
+activate UI
+UI -> API : Requisição POST /safras/plano (dadosPlanoSafra)
+activate API
+API -> SS : Chama 'criarPlanoSafra(dadosPlanoSafra)'
+activate SS
+SS -> SS : Valida dados do plano de safra
+SS -> DB : Salva novo plano de safra (dadosPlanoSafra)
+activate DB
+DB --> SS : Confirma registro (ID do Plano de Safra)
+deactivate DB
+SS --> API : Resposta de sucesso (ID do Plano de Safra)
+deactivate SS
+API --> UI : Resposta 201 Created (ID do Plano de Safra)
+deactivate API
+UI -> A : Exibe confirmação de plano de safra criado
+deactivate UI
+@enduml

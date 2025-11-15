@@ -1,0 +1,29 @@
+@startuml
+node "Nuvem" as Cloud {
+  node "Servidor da Aplicação" as AppServer {
+    artifact "API Gateway" as API_Gw
+    artifact "Serviços do Backend (Microsserviços)" as BackendServices
+    API_Gw -- BackendServices
+  }
+  node "Servidor de Banco de Dados" as DBServer {
+    artifact "Tabelas" as DB_Artifact
+  }
+  node "Amazon S3" as MediaServer {
+    artifact "Armazenamento de Objetos (S3-compatível)" as S3
+  }
+
+  AppServer -- DBServer : ODBC 
+  AppServer -- MediaServer : HTTP/S
+}
+
+node "Dispositivo Cliente Web" as WebClient {
+  artifact "Navegador Web" as Browser
+}
+
+node "Dispositivo Cliente Mobile" as MobileClient {
+  artifact "Aplicativo Mobile" as MobileApp
+}
+
+WebClient -- Cloud : HTTP/S 
+MobileClient -- Cloud : HTTP/S 
+@enduml

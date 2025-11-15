@@ -1,0 +1,32 @@
+@startuml
+!theme toy
+
+  state "Ciclo de Vida do Plano de Safra" as PlanoSafraLifecycle {
+  state "Criado" as Criado 
+  state "Aprovado" as Aprovado
+  state "Em Execução" as EmExecucao 
+  state "Revisão Necessária" as Revisao 
+  state "Concluído" as Concluido 
+  state "Cancelado" as Cancelado 
+
+  [*] --> Criado : Início do Planejamento
+
+  Criado --> Aprovado : Aprovar Plano [Proprietário/Admin.]
+  Criado --> Cancelado : Cancelar Plano [Admin.]
+
+  Aprovado --> EmExecucao : Iniciar Execução [Admin.]
+  Aprovado --> Criado : Solicitar Revisão [Proprietário]
+  Aprovado --> Cancelado : Cancelar Plano [Admin.]
+
+  EmExecucao --> Concluido : Concluir Execução [Admin./Técnico]
+  EmExecucao --> Revisao : Detectar Problema / Solicitar Revisão [Técnico]
+  EmExecucao --> Cancelado : Cancelar Plano [Admin.]
+
+  Revisao --> Aprovado : Re-aprovar Plano [Proprietário/Admin.]
+  Revisao --> EmExecucao : Retomar Execução [Admin.]
+  Revisao --> Cancelado : Cancelar Plano [Admin.]
+
+  Concluido --> [*] : Fim do Ciclo
+  Cancelado --> [*] : Fim do Ciclo
+}
+@enduml
