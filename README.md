@@ -97,7 +97,7 @@ Detalha as interações dos componentes do sistema para o planejamento de uma sa
 
 Ilustra o fluxo de mensagens entre os objetos para registrar observações de campo, incluindo a possibilidade de anexar mídias.
 
-![Diagrama de Comunicação - Cadastrar Observações de Campo (UC-15)](https://github.com/felipeaps46/Terranium/blob/main/Imagens/DiagramaComunicacao(CadastrarObservacoesCampo).png?raw=true)
+![Diagrama de Comunicação - Cadastrar Observações de Campo (UC-15)](https://github.com/felipeaps46/Terranium/blob/main/Imagens/DiagramaComunicacao(CadastroObservacoesCampo).png?raw=true)
 
 ---
 
@@ -139,7 +139,7 @@ Representa o fluxo de eventos e mensagens para o cadastro de uma nova propriedad
 
 Mostra a sequência de interações para o processo de planejamento de safra.
 
-![Diagrama de Sequência - Planejar Safra](https://github.com/felipeaps46/Terranium/blob/main/Imagens/DiagramaSequencia(PlanejarSafra).png?raw=true)
+![Diagrama de Sequência - Planejar Safra](https://github.com/felipeaps46/Terranium/blob/main/Imagens/DiagramaSequencia(PlanejarSafras).png?raw=true)
 
 ### Diagrama de Sequência: Cadastro de Observações de Campo
 
@@ -155,15 +155,3 @@ Oferece uma visão mais ampla das principais interações e fluxo de controle em
 
 
 ---
-
-## 🗺️ Como Navegar
-
-Utilize o índice no início deste `README` para pular diretamente para o diagrama de interesse. Cada diagrama possui uma breve descrição para contextualizar seu propósito no Projeto Terranium.
-
-## 🤝 Contribuições
-
-Se você identificar alguma inconsistência, tiver sugestões para melhorar a documentação ou desejar adicionar novos diagramas, sinta-se à vontade para abrir uma *issue* ou enviar um *pull request* neste repositório. Sua colaboração é muito bem-vinda!
-
----
-
-Desenvolvido com 💚 para o Projeto Terranium.
